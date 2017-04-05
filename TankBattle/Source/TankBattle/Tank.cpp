@@ -14,12 +14,20 @@ ATank::ATank()
 
 void ATank::SetTurretChildActor(UStaticMeshComponent* TurretFromBP)
 {
+	if (!TurretFromBP) { return; }
 	Turret = TurretFromBP;
 }
 
 void ATank::SetBarrelChildActor(UStaticMeshComponent* BarrelFromBP)
 {
+	if (!BarrelFromBP) { return; }
 	Barrel = BarrelFromBP;
+}
+
+void ATank::SetPlayerActor(UStaticMeshComponent* BodyFromBP)
+{
+	if (!BodyFromBP) { return; }
+	Body = BodyFromBP;
 }
 
 // Called when the game starts or when spawned
@@ -44,30 +52,35 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	InputComponent->BindAxis("Rotate_Turret", this, &ATank::RotateTurret);
 	InputComponent->BindAxis("Tilt_Turret", this, &ATank::TiltTurret);
 
-	InputComponent->BindAction("Forward", IE_Pressed, this, &ATank::MoveForward);
-
-	InputComponent->BindAction("Reverse", IE_Pressed, this, &ATank::MoveReverse);
+	InputComponent->BindAxis("Move_Player", this, &ATank::MoveTank);
+	InputComponent->BindAxis("Rotate_Player", this, &ATank::RotateTank);
 }
 
 void ATank::RotateTurret(float Speed)
 {
 	if (!Turret) { return; }
-	Turret->AddRelativeRotation(FRotator(0.f, Speed, 0.f));
+	float Rotation = GetWorld()->DeltaTimeSeconds * Speed * RotationSpeed;
+	Turret->AddRelativeRotation(FRotator(0.f, Rotation, 0.f));
 }
 
 void ATank::TiltTurret(float Speed)
 {
 	if (!Barrel) { return; }
-	Barrel->AddRelativeRotation(FRotator(Speed, 0.f, 0.f));
+	float Rotation = GetWorld()->DeltaTimeSeconds * Speed * RotationSpeed;
+	Barrel->AddRelativeRotation(FRotator(Rotation, 0.f, 0.f));
 }
 
-void ATank::MoveForward()
+void ATank::MoveTank(float Speed)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Move Forward called"));
+	if (!Body) { return; }
+	float Distance = GetWorld()->DeltaTimeSeconds * Speed * MovementSpeed;
+	Body->AddRelativeLocation(Body->GetForwardVector() * Distance);
 }
 
-void ATank::MoveReverse()
+void ATank::RotateTank(float Speed)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Reverse called"));
+	if (!Body) { return; }
+	float Rotation = GetWorld()->DeltaTimeSeconds * Speed * RotationSpeed;
+	Body->AddRelativeRotation(FRotator(0.f, Rotation, 0.f));
 }
 
