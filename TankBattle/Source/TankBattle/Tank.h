@@ -14,6 +14,12 @@ public:
 	// Sets default values for this pawn's properties
 	ATank();
 
+	UFUNCTION(BlueprintCallable, Category = Tank)
+		void SetTurretChildActor(UStaticMeshComponent* TurretFromBP);
+
+	UFUNCTION(BlueprintCallable, Category = Tank)
+		void SetBarrelChildActor(UStaticMeshComponent* BarrelFromBP);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,12 +31,16 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void RotateTurret();
+private:
+
+	void RotateTurret(float Speed);
+	void TiltTurret(float Speed);
 
 	void MoveForward();
 
 	void MoveReverse();
 
-	
+	UStaticMeshComponent* Turret = nullptr;
+	UStaticMeshComponent* Barrel = nullptr;
 	
 };
